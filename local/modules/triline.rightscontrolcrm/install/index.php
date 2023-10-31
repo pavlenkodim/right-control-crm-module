@@ -46,9 +46,9 @@ class triline_rightscontrolcrm extends CModule
             return dirname(__DIR__);
     }
 
-    public function isVersionD7()
+    public function isVersion()
     {
-        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '14.00.00');
+        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '23.00.00');
     }
 
     function InstallDB()
@@ -83,7 +83,8 @@ class triline_rightscontrolcrm extends CModule
 
     function DoInstall()
     {
-        if($this->isVersionD7())
+        global $APPLICATION;
+        if($this->isVersion())
         {
             \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
 
@@ -91,14 +92,25 @@ class triline_rightscontrolcrm extends CModule
             $this->InstallEvents();
             $this->InstallFiles();
         }
+        else
+        {
+            $APPLICATION->ThrowException(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_VERSION"));
+        }
+
+        $APPLICATION->IncludeAdminFile(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_INSTALL_TITLE"), $this->GetPath()."/install/step.php");
     }
 
     function DoUninstall()
     {
+        global $APPLICATION;
+
         $this->UnInstallFiles();
         $this->UnInstallEvents();
         $this->UnInstallDB();
 
+        \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+
+        $APPLICATION->IncludeAdminFile(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_UNINSTALL_TITLE"), $this->GetPath()."/install/unstep.php");
     }
 
     function GetModuleRightList()

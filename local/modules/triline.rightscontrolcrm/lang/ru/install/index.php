@@ -11,8 +11,8 @@ $MESS["TRILINE_RIGHTSCONTROLCRM_WRITE_SETTINGS"] = "Изменение наст�
 $MESS["TRILINE_RIGHTSCONTROLCRM_FULL"] = "Полный доступ";
 
 $MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_TITLE"] = "Установка модуля";
-$MESS["TRILINE_RIGHTSCONTROLCRM_UNINSTALL_TITLE"] = "Удаление модуля" ;
-$MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_VERSION"] = "Версия главного модуля ниже 14. Не поддерживается технология D7, необходимая модулю. Пожалуйста обновите систему.";
+$MESS["TRILINE_RIGHTSCONTROLCRM_UNINSTALL_TITLE"] = "Удаление модуля";
+$MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_VERSION"] = "Версия главного модуля ниже 23. Не поддерживаются технологии, необходимые модулю. Пожалуйста обновите систему.";
 
 #работа с .settings.php
 $MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_COUNT"] = "Количество установок модуля: ";
