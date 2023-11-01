@@ -1,12 +1,19 @@
 <?php
 
-namespace Triline\RightControlCrm\CustomFilter;
+/**
+ * Created by PhpStorm
+ * User: Dmitry Pavlenko
+ * e-mail: admin3@triline.kz
+ * @ PKF Temir
+ */
+
+namespace Triline\RightControlCrm;
 
 use \Bitrix\Main\Loader;
 
 class CustomFilter
 {
-    public function getCustomFilter() : array
+    public static function getCustomFilter() : array
     {
         global $USER;
         $filter = [];

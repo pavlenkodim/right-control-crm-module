@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Created by PhpStorm
+ * User: Dmitry Pavlenko
+ * e-mail: admin3@triline.kz
+ * @ PKF Temir
+ */
+
 use \Bitrix\Main\Localization\loc;
 use \Bitrix\Main\Config as Conf;
 use \Bitrix\Main\Config\Option;
@@ -63,21 +70,57 @@ class triline_rightscontrolcrm extends CModule
 
     function InstallEvents()
     {
-        return true;
+        \Bitrix\Main\EventManager::getInstance()->registerEventHandler($this->MODULE_ID, 'TrilineEvents', $this->MODULE_ID, '\Triline\RightControlCrm', 'eventHandler');
     }
 
     function UnInstallEvents()
     {
-        return true;
+        \Bitrix\Main\EventManager::getInstance()->unRegisterEventHandler($this->MODULE_ID, 'TrilineEvents', $this->MODULE_ID, '\Triline\RightControlCrm', 'eventHandler');
     }
 
     function InstallFiles($arParams = array())
     {
+        CopyDirFiles(
+            $_SERVER["DOCUMENT_ROOT"]."/local/modules/".$this->MODULE_ID."/install/components/",
+            $_SERVER["DOCUMENT_ROOT"]."/local/components/",
+            true, true
+        );
+
+        if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->getPath() . "/admin"))
+        {
+            CopyDirFiles($this->GetPath() . "/install/admin/", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin");
+            if ($dir = opendir($path))
+            {
+                while (false !== $item = readdir($dir))
+                {
+                    if (in_array($item, $this->exclusionAdminFiles))
+                        continue;
+                    file_put_contents($_SERVER["DOCUMENT_ROOT"]."/bitrix/admin/".$this->MODULE_ID."_".$item,
+                        "<".'? require($_SERVER["DOCUMENT_ROOT"]."'.$this->GetPath(true).'/admin/'.$item.'");?'.'>');
+                }
+                closedir($dir);
+            }
+        }
+
         return true;
     }
 
     function UnInstallFiles()
     {
+        \Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"] . "/local/components/bitrix/crm.timeline/");
+
+        if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->GetPath(). '/admin')) {
+            DeleteDirFiles($_SERVER["DOCUMENT_ROOT"] . $this->GetPath() . '/install/admin/', $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin');
+            if ($dir = opendir($path)) {
+                while (false !== $item = readdir($dir)) {
+                    if (in_array($item, $this->exclusionAdminFiles))
+                        continue;
+                    \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . $this->MODULE_ID . '_' . $item);
+                }
+                closedir($dir);
+            }
+        }
+
         return true;
     }
 
@@ -86,11 +129,18 @@ class triline_rightscontrolcrm extends CModule
         global $APPLICATION;
         if($this->isVersion())
         {
-            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
+            if (\Bitrix\Main\ModuleManager::isModuleInstalled('crm'))
+            {
+                \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
 
-            $this->InstallDB();
-            $this->InstallEvents();
-            $this->InstallFiles();
+                $this->InstallDB();
+                $this->InstallEvents();
+                $this->InstallFiles();
+            }
+            else
+            {
+                $APPLICATION->ThrowException(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_CRM"));
+            }
         }
         else
         {

@@ -13,6 +13,7 @@ $MESS["TRILINE_RIGHTSCONTROLCRM_FULL"] = "Полный доступ";
 $MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_TITLE"] = "Установка модуля";
 $MESS["TRILINE_RIGHTSCONTROLCRM_UNINSTALL_TITLE"] = "Удаление модуля";
 $MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_VERSION"] = "Версия главного модуля ниже 23. Не поддерживаются технологии, необходимые модулю. Пожалуйста обновите систему.";
+$MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_ERROR_CRM"] = "Не установлен модуль CRM. Работа модуля без CRM невозможна. Пожалуйста установите модуль CRM.";
 
 #работа с .settings.php
 $MESS["TRILINE_RIGHTSCONTROLCRM_INSTALL_COUNT"] = "Количество установок модуля: ";

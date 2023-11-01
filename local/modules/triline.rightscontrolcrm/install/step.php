@@ -3,7 +3,7 @@
 /**
  * Created by PhpStorm
  * User: Dmitry Pavlenko
- * @ Triline
+ * e-mail: admin3@triline.kz
  * @ PKF Temir
  */
 
@@ -12,7 +12,15 @@ use \Bitrix\Main\Localization\Loc;
 if (!check_bitrix_sessid())
     return;
 
-echo CAdminMessage::ShowNote(GetMessage("MOD_INST_OK"));
+if ($ex = $APPLICATION->GetException())
+    echo CAdminMessage::ShowMessage(array(
+        "TYPE" => "ERROR",
+        "MESSAGE" => Loc::getMessage("MOD_INST_ERR"),
+        "HTML" => true,
+    ));
+else
+    echo CAdminMessage::ShowNote(Loc::getMessage("MOD_INST_OK"));
+
 ?>
 <form action="<?php echo $APPLICATION->GetCurPage()?>">
     <input type="hidden" name="lang" value="<?php echo LANG?>">

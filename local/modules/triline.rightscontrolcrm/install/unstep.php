@@ -3,7 +3,7 @@
 /**
  * Created by PhpStorm
  * User: Dmitry Pavlenko
- * @ Triline
+ * e-mail: admin3@triline.kz
  * @ PKF Temir
  */
 
