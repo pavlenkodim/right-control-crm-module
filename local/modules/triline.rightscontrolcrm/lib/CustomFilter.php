@@ -16,7 +16,7 @@ class CustomFilter
     public static function getCustomFilter() : array
     {
         global $USER;
-        $filter = [];
+        $uFilter = [];
         $authorID = $USER->GetID();
         $authorAr = $USER->GetByID($authorID);
         $authorDeportment = array();
@@ -48,9 +48,9 @@ class CustomFilter
                     'AUTHOR_ID' => $arSubordinate,
                     'RESPONSIBLE_ID' => $authorID,
                 );
-                $filter = $userFilter; // Добавляется пользовательский фильтр
+                $uFilter = $userFilter; // Добавляется пользовательский фильтр
             }
         }
-        return $filter;
+        return $uFilter;
     }
 }

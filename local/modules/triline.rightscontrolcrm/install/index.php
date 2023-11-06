@@ -45,7 +45,7 @@ class triline_rightscontrolcrm extends CModule
         $this->SHOW_GROUP_RIGHTS = "Y";
     }
 
-    public function GetPath($notDocumentRoot=false)
+    public function GetPath($notDocumentRoot=false): array|string
     {
         if($notDocumentRoot)
             return str_ireplace(Application::getDocumentRoot(),'',dirname(__DIR__));
@@ -58,84 +58,61 @@ class triline_rightscontrolcrm extends CModule
         return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '23.00.00');
     }
 
-    function InstallDB()
+    function InstallDB(): bool
+    {
+//        RegisterModule("triline.rightscontrolcrm");
+
+        return true;
+    }
+
+    function UnInstallDB(): bool
+    {
+//        UnRegisterModule("triline.rightscontrolcrm");
+
+        return true;
+    }
+
+    function InstallEvents(): bool
     {
         return true;
     }
 
-    function UnInstallDB()
+    function UnInstallEvents(): bool
     {
         return true;
     }
 
-    function InstallEvents()
-    {
-        \Bitrix\Main\EventManager::getInstance()->registerEventHandler($this->MODULE_ID, 'TrilineEvents', $this->MODULE_ID, '\Triline\RightControlCrm', 'eventHandler');
-    }
-
-    function UnInstallEvents()
-    {
-        \Bitrix\Main\EventManager::getInstance()->unRegisterEventHandler($this->MODULE_ID, 'TrilineEvents', $this->MODULE_ID, '\Triline\RightControlCrm', 'eventHandler');
-    }
-
-    function InstallFiles($arParams = array())
+    public function InstallFiles(): bool
     {
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/local/modules/".$this->MODULE_ID."/install/components/",
-            $_SERVER["DOCUMENT_ROOT"]."/local/components/",
-            true, true
+            $_SERVER["DOCUMENT_ROOT"]."/local/modules/".$this->MODULE_ID."/install/components",
+            $_SERVER["DOCUMENT_ROOT"]."/local/components",
+            true,
+            true
         );
-
-        if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->getPath() . "/admin"))
-        {
-            CopyDirFiles($this->GetPath() . "/install/admin/", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin");
-            if ($dir = opendir($path))
-            {
-                while (false !== $item = readdir($dir))
-                {
-                    if (in_array($item, $this->exclusionAdminFiles))
-                        continue;
-                    file_put_contents($_SERVER["DOCUMENT_ROOT"]."/bitrix/admin/".$this->MODULE_ID."_".$item,
-                        "<".'? require($_SERVER["DOCUMENT_ROOT"]."'.$this->GetPath(true).'/admin/'.$item.'");?'.'>');
-                }
-                closedir($dir);
-            }
-        }
 
         return true;
     }
 
-    function UnInstallFiles()
+    public function UnInstallFiles(): bool
     {
         \Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"] . "/local/components/bitrix/crm.timeline/");
 
-        if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->GetPath(). '/admin')) {
-            DeleteDirFiles($_SERVER["DOCUMENT_ROOT"] . $this->GetPath() . '/install/admin/', $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin');
-            if ($dir = opendir($path)) {
-                while (false !== $item = readdir($dir)) {
-                    if (in_array($item, $this->exclusionAdminFiles))
-                        continue;
-                    \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . $this->MODULE_ID . '_' . $item);
-                }
-                closedir($dir);
-            }
-        }
-
         return true;
     }
 
-    function DoInstall()
+    function DoInstall(): void
     {
         global $APPLICATION;
         if($this->isVersion())
         {
             if (\Bitrix\Main\ModuleManager::isModuleInstalled('crm'))
             {
-                \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
-
                 $this->InstallDB();
                 $this->InstallEvents();
                 $this->InstallFiles();
+
+                \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
             }
             else
             {
@@ -150,7 +127,7 @@ class triline_rightscontrolcrm extends CModule
         $APPLICATION->IncludeAdminFile(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_INSTALL_TITLE"), $this->GetPath()."/install/step.php");
     }
 
-    function DoUninstall()
+    function DoUninstall(): void
     {
         global $APPLICATION;
 
@@ -163,7 +140,7 @@ class triline_rightscontrolcrm extends CModule
         $APPLICATION->IncludeAdminFile(Loc::getMessage("TRILINE_RIGHTSCONTROLCRM_UNINSTALL_TITLE"), $this->GetPath()."/install/unstep.php");
     }
 
-    function GetModuleRightList()
+    function GetModuleRightList(): array
     {
         return array(
             "reference_id" => array("D","K","S","W"),

@@ -7,7 +7,7 @@
  * @ PKF Temir
  */
 
-$arModukeVersion = array(
-    "VERSION" => "0.0.1",
-    "VERSION_DATE" => "2023-10-23 16:44:00"
+$arModuleVersion = array(
+    "VERSION" => "0.0.2",
+    "VERSION_DATE" => "2023-11-02 16:02:00"
 );
