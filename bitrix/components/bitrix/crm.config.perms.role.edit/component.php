@@ -161,6 +161,7 @@ $entityOperationsMap = [
 	'BUTTON' => ['READ', 'WRITE'],
 	'SALETARGET' => ['READ', 'WRITE'],
 	'EXCLUSION' => ['READ', 'WRITE'],
+    'ACTIVITY' => ['READ'],
 ];
 
 $arResult['ENTITY'] = [];
@@ -264,9 +265,11 @@ $arResult['ENTITY'] = array_merge(
 		'BUTTON' => GetMessage('CRM_ENTITY_TYPE_BUTTON'),
 		'SALETARGET' => GetMessage('CRM_ENTITY_TYPE_SALETARGET'),
 		'EXCLUSION' => GetMessage('CRM_ENTITY_TYPE_EXCLUSION'),
+        'ACTIVITY' => 'Дело',
 	]
 );
 
+$arResult['ROLE_PERM']['ACTIVITY'] =
 $arResult['ROLE_PERM']['LEAD'] = $arResult['ROLE_PERM']['DEAL'] =
 $arResult['ROLE_PERM']['QUOTE'] = $arResult['ROLE_PERM']['INVOICE'] =
 $arResult['ROLE_PERM']['COMPANY'] = $arResult['ROLE_PERM']['CONTACT'] =
