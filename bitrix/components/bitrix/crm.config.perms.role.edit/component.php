@@ -143,6 +143,13 @@ $permissionSet = [
 	BX_CRM_PERM_OPEN => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_OPEN),
 	BX_CRM_PERM_ALL => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_ALL)
 ];
+$permissionSetForAct = [
+    BX_CRM_PERM_NONE => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_NONE),
+    BX_CRM_PERM_SELF => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_SELF),
+    BX_CRM_PERM_DEPARTMENT => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_DEPARTMENT),
+    BX_CRM_PERM_SUBDEPARTMENT => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_SUBDEPARTMENT),
+    BX_CRM_PERM_ALL => GetMessage('CRM_PERMS_TYPE_'.BX_CRM_PERM_ALL)
+];
 $operations = ['READ', 'ADD', 'WRITE', 'DELETE'];
 $operationsWithImport = $operations;
 $operationsWithImport[] = 'EXPORT';
@@ -265,11 +272,11 @@ $arResult['ENTITY'] = array_merge(
 		'BUTTON' => GetMessage('CRM_ENTITY_TYPE_BUTTON'),
 		'SALETARGET' => GetMessage('CRM_ENTITY_TYPE_SALETARGET'),
 		'EXCLUSION' => GetMessage('CRM_ENTITY_TYPE_EXCLUSION'),
-        'ACTIVITY' => 'Дело',
+        'ACTIVITY' => GetMessage('CRM_ENTITY_TYPE_ACTIVITY'),
 	]
 );
 
-$arResult['ROLE_PERM']['ACTIVITY'] =
+$arResult['ROLE_PERM']['ACTIVITY'] = $permissionSetForAct;
 $arResult['ROLE_PERM']['LEAD'] = $arResult['ROLE_PERM']['DEAL'] =
 $arResult['ROLE_PERM']['QUOTE'] = $arResult['ROLE_PERM']['INVOICE'] =
 $arResult['ROLE_PERM']['COMPANY'] = $arResult['ROLE_PERM']['CONTACT'] =

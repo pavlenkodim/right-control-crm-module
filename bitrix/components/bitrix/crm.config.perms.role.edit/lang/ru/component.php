@@ -22,4 +22,5 @@ $MESS["CRM_PERMS_TYPE_AUTOMATION_ALL"] = "Изменение";
 $MESS["CRM_PERMS_ENTITY_LIST"] = "Права доступа";
 $MESS["CRM_PERMS_ROLE_EDIT"] = "Управление ролью";
 $MESS["CRM_ENTITY_TYPE_ORDER"] = "Заказ";
+$MESS["CRM_ENTITY_TYPE_ACTIVITY"] = "Дело";
 ?>
