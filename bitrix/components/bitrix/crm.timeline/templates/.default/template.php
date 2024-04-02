@@ -474,7 +474,113 @@ $filterClassName = $arResult['IS_HISTORY_FILTER_APPLIED']
 				}
 			);
 			BX.CrmTimelineManager.setDefault(timeline);
+
 		}
 	);
+</script>
+<?php
+$userPermissions = CCrmRole::GetUserPerms($USER->GetID());
+if ($userPermissions['ACTIVITY']['READ'])
+{
+    $perm = json_encode($userPermissions['ACTIVITY']['READ']);
+}
+
+$HeadID = $USER->GetID();
+
+if(CModule::IncludeModule("intranet")){
+    $arUsers = CIntranetUtils::GetSubordinateEmployees($HeadID);
+    while($User = $arUsers->GetNext()){
+        if($User['ID'] != $HeadID){
+            echo '<a target="_blanc"  href="/rating/?user='.$User['ID'].'">'.$User['LAST_NAME'].'  '.$User['NAME'].' '.$User['SECOND_NAME'].'</a> <br>';
+        }
+    }
+}
+
+?>
+<script>
+    const domain = '192.168.1.137',
+          user = {
+              id: <?=$USER->GetID()?>,
+              isAdmin: '<?=$USER->IsAdmin()?>',
+              perm: <?=$perm?>
+          },
+          entity = <?=$arResult['ENTITY_ID']?>,
+          entityType = <?=$arResult['ENTITY_TYPE_ID']?>,
+          perms = {
+              none: '',
+              self: 'A',
+              department: 'D',
+              subdepartment: 'F',
+              all: 'X'
+          };
+
+    document.addEventListener('DOMContentLoaded', event => {
+        const activitesPlanned = document.querySelectorAll('.crm-timeline__card');
+
+        console.log(user.perm['-']);
+
+        activitesPlanned.forEach(item => {
+            hideElementTimeLine(item)
+                .then(response => {
+                    prepareData(response, item)
+                })
+                .catch(console.error);
+        });
+
+        async function hideElementTimeLine(item) {
+            if (/ACTIVITY/.test(item.dataset.id)) {
+                const activityId = item.dataset.id.replace('ACTIVITY_', '');
+                const response = fetch(`https://${domain}/rest/1/vs8qgambvrfdxb7l/crm.activity.get.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({id: activityId})
+                });
+                return (await response).json()
+            } else {
+                const timelineLogId = item.dataset.id;
+                const response = fetch(`https://${domain}/rest/1/vs8qgambvrfdxb7l/crm.timeline.comment.get.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        id: timelineLogId
+                    })
+                });
+                return (await response).json();
+            }
+        }
+
+        function prepareData(data, element) {
+            if (!user.isAdmin) {
+                switch (user.perm['-']) {
+                    case perms.none:
+                        hide(element);
+                        break;
+                    case perms.self:
+                        if (data.result.AUTHOR_ID != user.id) {
+                            hide(element);
+                        }
+                        break;
+                    case perms.department:
+
+                        break;
+                    case perms.subdepartment:
+
+                        break;
+                    case perms.all:
+                        break;
+                }
+
+            }
+            // console.log(element);
+        }
+
+        function hide(element) {
+            element.parentElement.parentElement.style.display = 'none';
+        }
+    });
 </script>
 <?
