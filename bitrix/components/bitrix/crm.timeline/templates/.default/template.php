@@ -485,15 +485,21 @@ if ($userPermissions['ACTIVITY']['READ'])
     $perm = json_encode($userPermissions['ACTIVITY']['READ']);
 }
 
-$HeadID = $USER->GetID();
+$headID = $USER->GetID();
 
-if(CModule::IncludeModule("intranet")){
-    $arUsers = CIntranetUtils::GetSubordinateEmployees($HeadID);
-    while($User = $arUsers->GetNext()){
-        if($User['ID'] != $HeadID){
-            echo '<a target="_blanc"  href="/rating/?user='.$User['ID'].'">'.$User['LAST_NAME'].'  '.$User['NAME'].' '.$User['SECOND_NAME'].'</a> <br>';
+function getEmployees($id, $subdep = false)
+{
+    $arEmployees = [];
+    if(CModule::IncludeModule("intranet")){
+        $arUsers = CIntranetUtils::GetSubordinateEmployees($id, true);
+        while($User = $arUsers->GetNext()){
+            if($User['ID'] != $id){
+                $arEmployees[] = $User['ID'];
+
+            }
         }
     }
+    return $arEmployees;
 }
 
 ?>
@@ -502,7 +508,8 @@ if(CModule::IncludeModule("intranet")){
           user = {
               id: <?=$USER->GetID()?>,
               isAdmin: '<?=$USER->IsAdmin()?>',
-              perm: <?=$perm?>
+              perm: <?=$perm?>,
+              department: <?= json_encode(getEmployees($USER->GetID(), true))?>
           },
           entity = <?=$arResult['ENTITY_ID']?>,
           entityType = <?=$arResult['ENTITY_TYPE_ID']?>,
@@ -514,20 +521,38 @@ if(CModule::IncludeModule("intranet")){
               all: 'X'
           };
 
-    document.addEventListener('DOMContentLoaded', event => {
-        const activitesPlanned = document.querySelectorAll('.crm-timeline__card');
+    document.addEventListener('DOMContentLoaded', () => {
+        let elementsProcessed = [];
+        user.department.push(`${user.id}`);
 
-        console.log(user.perm['-']);
-
-        activitesPlanned.forEach(item => {
-            hideElementTimeLine(item)
-                .then(response => {
-                    prepareData(response, item)
-                })
-                .catch(console.error);
+        const streamContainer = document.querySelector('.crm-entity-stream-container');
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutations => {
+                if (mutations.previousSibling) {
+                    const newActivities = document.querySelectorAll('.crm-timeline__card');
+                    main(newActivities);
+                }
+            })
         });
+        observer.observe(streamContainer, { childList: true, subtree: true });
+
+        function main (activities) {
+            activities.forEach(item => {
+                if (elementsProcessed.includes(item.dataset.id)) {
+                    return false;
+                }
+                console.log(item);
+                hideElementTimeLine(item)
+                    .then(response => {
+                        prepareData(response, item)
+                    })
+                    .catch(console.error);
+            });
+        }
 
         async function hideElementTimeLine(item) {
+            elementsProcessed.push(item.dataset.id);
+
             if (/ACTIVITY/.test(item.dataset.id)) {
                 const activityId = item.dataset.id.replace('ACTIVITY_', '');
                 const response = fetch(`https://${domain}/rest/1/vs8qgambvrfdxb7l/crm.activity.get.json`, {
@@ -554,28 +579,32 @@ if(CModule::IncludeModule("intranet")){
         }
 
         function prepareData(data, element) {
+            console.log(data.result); // TODO: Удалить после тестов
             if (!user.isAdmin) {
                 switch (user.perm['-']) {
                     case perms.none:
                         hide(element);
                         break;
                     case perms.self:
-                        if (data.result.AUTHOR_ID != user.id) {
+                        if (data.result.AUTHOR_ID != user.id && data.result.RESPONSIBLE_ID != user.id) {
                             hide(element);
                         }
                         break;
                     case perms.department:
-
+                        if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
+                            hide(element);
+                        }
                         break;
                     case perms.subdepartment:
-
+                        if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
+                            hide(element);
+                        }
                         break;
                     case perms.all:
                         break;
                 }
 
             }
-            // console.log(element);
         }
 
         function hide(element) {
