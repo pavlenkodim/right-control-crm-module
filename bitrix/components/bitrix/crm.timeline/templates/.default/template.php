@@ -491,7 +491,7 @@ function getEmployees($id, $subdep = false)
 {
     $arEmployees = [];
     if(CModule::IncludeModule("intranet")){
-        $arUsers = CIntranetUtils::GetSubordinateEmployees($id, true);
+        $arUsers = CIntranetUtils::GetSubordinateEmployees($id, true); // TODO: Сделать разделение для отдел и подотдел
         while($User = $arUsers->GetNext()){
             if($User['ID'] != $id){
                 $arEmployees[] = $User['ID'];
@@ -530,27 +530,61 @@ function getEmployees($id, $subdep = false)
             mutations.forEach(mutations => {
                 if (mutations.previousSibling) {
                     const newActivities = document.querySelectorAll('.crm-timeline__card');
+                    const newEvents = document.querySelectorAll('.crm-entity-stream-content-event');
                     main(newActivities);
+                    mainForEvents(newEvents);
                 }
             })
         });
         observer.observe(streamContainer, { childList: true, subtree: true });
 
+        // For Events - CalendarActivity
+        function mainForEvents(events) {
+            let eventId = 1;
+            events.forEach(item => {
+                if (item.firstChild.className === 'crm-entity-stream-content-live-im-detail') {
+                    return;
+                }
+                if (elementsProcessed.includes(item.dataset.id)) {
+                    return;
+                }
+                const userId = prepareUserIdForEvents(item);
+
+                item.dataset.id = `${eventId}`;
+                elementsProcessed.push(`${eventId}`);
+                eventId++;
+
+                checkPerms(userId, item);
+            })
+        }
+
+        function prepareUserIdForEvents (element) {
+            let targetUrl;
+            element.childNodes.forEach(child => {
+                if (child.tagName === 'A') {
+                    targetUrl = child.getAttribute('href');
+                }
+            })
+            const id = targetUrl.replace(/[^0-9]/g, '');
+            return {result: {AUTHOR_ID: id}};
+        }
+
+        // For Activity
         function main (activities) {
             activities.forEach(item => {
                 if (elementsProcessed.includes(item.dataset.id)) {
-                    return false;
+                    return;
                 }
-                console.log(item);
-                hideElementTimeLine(item)
+                // console.log(item); // TODO: Удалить после тестов
+                getOwnerData(item)
                     .then(response => {
-                        prepareData(response, item)
+                        checkPerms(response, item)
                     })
                     .catch(console.error);
             });
         }
 
-        async function hideElementTimeLine(item) {
+        async function getOwnerData(item) {
             elementsProcessed.push(item.dataset.id);
 
             if (/ACTIVITY/.test(item.dataset.id)) {
@@ -570,16 +604,15 @@ function getEmployees($id, $subdep = false)
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
                     },
-                    body: JSON.stringify({
-                        id: timelineLogId
-                    })
+                    body: JSON.stringify({id: timelineLogId})
                 });
                 return (await response).json();
             }
         }
 
-        function prepareData(data, element) {
-            console.log(data.result); // TODO: Удалить после тестов
+        // Main function for check permission and hide elements
+        function checkPerms(data, element) {
+            // console.log(data.result); // TODO: Удалить после тестов
             if (!user.isAdmin) {
                 switch (user.perm['-']) {
                     case perms.none:
@@ -609,6 +642,7 @@ function getEmployees($id, $subdep = false)
 
         function hide(element) {
             element.parentElement.parentElement.style.display = 'none';
+            // console.log(element); // TODO: Удалить после тестов
         }
     });
 </script>
