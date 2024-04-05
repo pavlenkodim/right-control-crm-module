@@ -502,8 +502,8 @@ function getEmployees($id, $subdep = false)
 
 ?>
 <script>
-    const domain = '192.168.1.137',
-          user = {
+    const webhuk = 'https://192.168.1.137/rest/1/vs8qgambvrfdxb7l';
+    const user = {
               id: <?=$USER->GetID()?>,
               isAdmin: '<?=$USER->IsAdmin()?>',
               perm: <?=$perm?>,
@@ -591,7 +591,7 @@ function getEmployees($id, $subdep = false)
 
             if (/ACTIVITY/.test(item.dataset.id)) {
                 const activityId = item.dataset.id.replace('ACTIVITY_', '');
-                const response = fetch(`https://${domain}/rest/1/vs8qgambvrfdxb7l/crm.activity.get.json`, {
+                const response = fetch(`${webhuk}/crm.activity.get.json`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -601,7 +601,7 @@ function getEmployees($id, $subdep = false)
                 return (await response).json()
             } else {
                 const timelineLogId = item.dataset.id;
-                const response = fetch(`https://${domain}/rest/1/vs8qgambvrfdxb7l/crm.timeline.comment.get.json`, {
+                const response = fetch(`${webhuk}/crm.timeline.comment.get.json`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
