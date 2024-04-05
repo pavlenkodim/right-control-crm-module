@@ -485,13 +485,11 @@ if ($userPermissions['ACTIVITY']['READ'])
     $perm = json_encode($userPermissions['ACTIVITY']['READ']);
 }
 
-$headID = $USER->GetID();
-
 function getEmployees($id, $subdep = false)
 {
     $arEmployees = [];
     if(CModule::IncludeModule("intranet")){
-        $arUsers = CIntranetUtils::GetSubordinateEmployees($id, true); // TODO: Сделать разделение для отдел и подотдел
+        $arUsers = CIntranetUtils::GetSubordinateEmployees($id, $subdep);
         while($User = $arUsers->GetNext()){
             if($User['ID'] != $id){
                 $arEmployees[] = $User['ID'];
@@ -509,7 +507,7 @@ function getEmployees($id, $subdep = false)
               id: <?=$USER->GetID()?>,
               isAdmin: '<?=$USER->IsAdmin()?>',
               perm: <?=$perm?>,
-              department: <?= json_encode(getEmployees($USER->GetID(), true))?>
+              department: <?= json_encode(getEmployees($USER->GetID()))?>
           },
           entity = <?=$arResult['ENTITY_ID']?>,
           entityType = <?=$arResult['ENTITY_TYPE_ID']?>,
@@ -520,6 +518,10 @@ function getEmployees($id, $subdep = false)
               subdepartment: 'F',
               all: 'X'
           };
+
+          if (user.perm['-'] === perms.subdepartment) {
+              user.department = <?= json_encode(getEmployees($USER->GetID(), true))?>;
+          }
 
     document.addEventListener('DOMContentLoaded', () => {
         let elementsProcessed = [];
