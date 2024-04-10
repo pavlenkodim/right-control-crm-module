@@ -13,7 +13,6 @@ Rights Control CRM For Activity - это модуль, разработанны�
     ```javascript
     const webhuk = 'https://192.168.1.137/rest/1/vs8qgambvrfdxb7l';
     ```
-3. 
 
 ## Использование
 
