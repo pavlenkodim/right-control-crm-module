@@ -45,9 +45,9 @@ class triline_rightscontrol extends CModule
             return dirname(__DIR__);
     }
 
-    public function isVersionD7()
+    public function isVersion()
     {
-        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '14.00.00');
+        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '23.00.00');
     }
 
     function InstallDB()
@@ -87,7 +87,7 @@ class triline_rightscontrol extends CModule
     function DoInstall()
     {
         global $APPLICATION, $DOCUMENT_ROOT;
-        if($this->isVersionD7())
+        if($this->isVersion())
         {
             $this->InstallFiles();
             $this->InstallDB();
