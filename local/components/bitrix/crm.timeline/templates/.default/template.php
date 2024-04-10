@@ -527,6 +527,10 @@ function getEmployees($id, $subdep = false)
         let elementsProcessed = [];
         user.department.push(`${user.id}`);
 
+        if (user.perm['-'] === undefined || user.perm['-'] === '') {
+            permsNotChange();
+        }
+
         const streamContainer = document.querySelector('.crm-entity-stream-container');
         const observer = new MutationObserver(mutations => {
             mutations.forEach(mutations => {
@@ -614,32 +618,51 @@ function getEmployees($id, $subdep = false)
 
         // Main function for check permission and hide elements
         function checkPerms(data, element) {
-            // console.log(data.result); // TODO: Удалить после тестов
+            // console.log(user.perm['-']); // TODO: Удалить после тестов
             if (!user.isAdmin) {
-                switch (user.perm['-']) {
-                    case perms.none:
-                        hide(element);
-                        break;
-                    case perms.self:
-                        if (data.result.AUTHOR_ID != user.id && data.result.RESPONSIBLE_ID != user.id) {
+                try {
+                    switch (user.perm['-']) {
+                        case perms.none:
                             hide(element);
-                        }
-                        break;
-                    case perms.department:
-                        if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
-                            hide(element);
-                        }
-                        break;
-                    case perms.subdepartment:
-                        if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
-                            hide(element);
-                        }
-                        break;
-                    case perms.all:
-                        break;
+                            break;
+                        case perms.self:
+                            if (data.result.AUTHOR_ID != user.id && data.result.RESPONSIBLE_ID != user.id) {
+                                hide(element);
+                            }
+                            break;
+                        case perms.department:
+                            if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
+                                hide(element);
+                            }
+                            break;
+                        case perms.subdepartment:
+                            if (user.department.indexOf(data.result.AUTHOR_ID) === -1 && user.department.indexOf(data.result.RESPONSIBLE_ID) === -1) {
+                                hide(element);
+                            }
+                            break;
+                        case perms.all:
+                            break;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    permsNotChange('Непредвиденная ошибка при проверке прав доступа!');
                 }
-
             }
+        }
+
+        function permsNotChange (message = null) {
+            const parentElement = document.querySelector('.crm-entity-stream-section-live-im');
+            const elementWarn = document.createElement('div');
+            const defaultMessage = 'У вас нет прав для просмотра дел или права не настроены. \nОбратитесь к вашему администратору.'
+            elementWarn.textContent = message ? message : defaultMessage;
+            elementWarn.style.textAlign = 'center';
+            elementWarn.style.color = '#fff';
+            elementWarn.style.fontWeight = '500';
+            elementWarn.style.padding = '10px';
+            elementWarn.style.marginTop = '10px';
+            elementWarn.style.borderRadius = '30px';
+            elementWarn.style.backgroundColor = '#FF6666';
+            parentElement.append(elementWarn);
         }
 
         function hide(element) {
