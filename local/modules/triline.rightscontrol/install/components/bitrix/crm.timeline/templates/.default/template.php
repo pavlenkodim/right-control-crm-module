@@ -485,6 +485,10 @@ if ($userPermissions['ACTIVITY']['READ'])
     $perm = json_encode($userPermissions['ACTIVITY']['READ']);
 }
 
+Bitrix\Main\Loader::includeModule('triline.rightscontrol');
+
+$webhuk = Bitrix\Main\Config\Option::get('triline.rightscontrol', 'webhuk');
+
 function getEmployees($id, $subdep = false)
 {
     $arEmployees = [];
@@ -502,7 +506,7 @@ function getEmployees($id, $subdep = false)
 
 ?>
 <script>
-    const webhuk = 'https://192.168.1.137/rest/1/vs8qgambvrfdxb7l';
+    const webhuk = '<?=$webhuk?>';
     const user = {
               id: <?=$USER->GetID()?>,
               isAdmin: '<?=$USER->IsAdmin()?>',
@@ -595,7 +599,7 @@ function getEmployees($id, $subdep = false)
 
             if (/ACTIVITY/.test(item.dataset.id)) {
                 const activityId = item.dataset.id.replace('ACTIVITY_', '');
-                const response = fetch(`${webhuk}/crm.activity.get.json`, {
+                const response = fetch(`${webhuk}crm.activity.get.json`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -605,7 +609,7 @@ function getEmployees($id, $subdep = false)
                 return (await response).json()
             } else {
                 const timelineLogId = item.dataset.id;
-                const response = fetch(`${webhuk}/crm.timeline.comment.get.json`, {
+                const response = fetch(`${webhuk}crm.timeline.comment.get.json`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'

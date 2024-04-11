@@ -57,6 +57,7 @@ class triline_rightscontrol extends CModule
 
     function UnInstallDB()
     {
+        Option::delete($this->MODULE_ID);
         return true;
     }
 
