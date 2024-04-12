@@ -485,8 +485,6 @@ if ($userPermissions['ACTIVITY']['READ'])
     $perm = json_encode($userPermissions['ACTIVITY']['READ']);
 }
 
-Bitrix\Main\Loader::includeModule('triline.rightscontrol');
-
 $webhuk = Bitrix\Main\Config\Option::get('triline.rightscontrol', 'webhuk');
 
 function getEmployees($id, $subdep = false)
